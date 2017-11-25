@@ -58,4 +58,5 @@ function current_time() {
 # Source: https://www.kirsle.net/wizards/ps1.html
 export PS1="${BOLD}${RESET}${WHITE}┌─${RESET} ${WHITE}\u@\h${RESET} ${BLUE}\w${RESET}\$(git_current_branch) \$(docker_status) \$(current_time)\n${WHITE}└─${RESET} ${YELLOW}%${RESET} "
 
+# File: https://github.com/git/git/blob/master/contrib/completion/git-completion.bash
 source ~/.git-completion.bash
