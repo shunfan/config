@@ -1,2 +1,2 @@
-# config
-Personal collection of configuration files
+# Config
+Config is my personal collection of configuration files
