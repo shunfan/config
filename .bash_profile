@@ -25,17 +25,7 @@ function git_current_branch() {
 # Source: https://github.com/robbyrussell/oh-my-zsh/blob/master/lib/git.zsh#L11-L30
 function parse_git_dirty() {
   local STATUS=''
-  local -a FLAGS
-  FLAGS=('--porcelain')
-  if [[ "$(command git config --get oh-my-zsh.hide-dirty)" != "1" ]]; then
-    if [[ $POST_1_7_2_GIT -gt 0 ]]; then
-      FLAGS+='--ignore-submodules=dirty'
-    fi
-    if [[ "$DISABLE_UNTRACKED_FILES_DIRTY" == "true" ]]; then
-      FLAGS+='--untracked-files=no'
-    fi
-    STATUS=$(command git status ${FLAGS} 2> /dev/null | tail -n1)
-  fi
+  STATUS=$(command git status --porcelain 2> /dev/null | tail -n1)
   if [[ -n $STATUS ]]; then
     echo "${RED}✗${RESET}"
   else
@@ -43,11 +33,32 @@ function parse_git_dirty() {
   fi
 }
 
+function node_version() {
+  local NODE_VERSION=''
+  NODE_VERSION=$(command node -v | awk '{gsub(/v/, "", $1); print $1}')
+  echo "(Node ${GREEN}${NODE_VERSION}${RESET})"
+}
+
+function java_version() {
+  local JAVA_VERSION=''
+  JAVA_VERSION=$(command java -version 2>&1 >/dev/null | grep 'java version' | awk '{gsub(/"/, "", $3); print $3}')
+  echo "(Java ${GREEN}${JAVA_VERSION}${RESET})"
+}
+
 function docker_status() {
-  if docker ps > /dev/null 2>&1; then
+  if docker ps >/dev/null 2>&1; then
     echo "(Docker ${GREEN}●${RESET})"
   else
     echo "(Docker ${RED}●${RESET})"
+  fi
+}
+
+function mongodb_status() {
+  # Source: https://stackoverflow.com/a/31563972
+  if [[ "$(command ps -ef | grep mongod | grep -v grep | wc -l | tr -d ' ')" != "0" ]]; then
+    echo "(MongoDB ${GREEN}●${RESET})"
+  else
+    echo "(MongoDB ${RED}●${RESET})"
   fi
 }
 
@@ -56,7 +67,26 @@ function current_time() {
 }
 
 # Source: https://www.kirsle.net/wizards/ps1.html
-export PS1="${BOLD}${RESET}${WHITE}┌─${RESET} ${WHITE}\u@\h${RESET} ${BLUE}\w${RESET}\$(git_current_branch) \$(docker_status) \$(current_time)\n${WHITE}└─${RESET} ${YELLOW}%${RESET} "
+export PS1="\
+${BOLD}${RESET}\
+${WHITE}┌─${RESET} \
+${WHITE}\u@\h${RESET} \
+${BLUE}\w${RESET}\
+\$(git_current_branch) \$(node_version) \$(java_version) \$(docker_status) \$(mongodb_status) \$(current_time)\
+\n\[${WHITE}\]└─\[${RESET}\] \
+\[${YELLOW}\]%\[${RESET}\] "
 
-# File: https://github.com/git/git/blob/master/contrib/completion/git-completion.bash
+# Other sources
 source ~/.git-completion.bash
+
+# Alias
+alias dev="cd ~/Developer"
+
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+
+# Setting PATH for Python 3.6
+# The original version is saved in .bash_profile.pysave
+PATH="/Library/Frameworks/Python.framework/Versions/3.6/bin:${PATH}"
+export PATH
