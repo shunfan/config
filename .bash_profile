@@ -66,11 +66,6 @@ function mongodb_status() {
   fi
 }
 
-function bitcoin_price() {
-  curl -s -N 'https://api.gemini.com/v1/pubticker/btcusd' | \
-  python -c "import sys, json; res = json.load(sys.stdin); print '(Bitcoin: $' + str(res['last']) + ')'"
-}
-
 # Source: https://www.kirsle.net/wizards/ps1.html
 export PS1="\
 ${BOLD}${RESET}\
