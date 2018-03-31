@@ -10,10 +10,6 @@ BOLD=$(tput bold)
 REVERSE=$(tput rev)
 RESET=$(tput sgr0)
 
-function current_time() {
-  echo "[$(date +"%I:%M %p")]"
-}
-
 # Source: https://github.com/robbyrussell/oh-my-zsh/blob/master/lib/git.zsh#L61-L74
 function git_current_branch() {
   local ref
@@ -23,7 +19,7 @@ function git_current_branch() {
     [[ $ret == 128 ]] && return  # no git repo.
     ref=$(command git rev-parse --short HEAD 2> /dev/null) || return
   fi
-  echo "${YELLOW} (${ref#refs/heads/} $(parse_git_dirty)${YELLOW})${RESET}"
+  echo " ${YELLOW}(${ref#refs/heads/}${RESET} $(parse_git_dirty)${YELLOW})${RESET}"
 }
 
 # Source: https://github.com/robbyrussell/oh-my-zsh/blob/master/lib/git.zsh#L11-L30
@@ -68,12 +64,10 @@ function mongodb_status() {
 
 # Source: https://www.kirsle.net/wizards/ps1.html
 export PS1="\
-${BOLD}${RESET}\
-${WHITE}┌─${RESET} \
-${WHITE}\$(current_time) \u@\h${RESET} \
-${BLUE}\w${RESET}\
-\$(git_current_branch) \$(node_version) \$(java_version) \$(docker_status) \$(mongodb_status)\
-\n\[${WHITE}\]└─\[${RESET}\] \
+\[${WHITE}\]\u@\h\[${RESET}\] \
+\[${BLUE}\]\w\[${RESET}\]\
+\$(git_current_branch) \$(node_version) \$(java_version) \$(docker_status) \$(mongodb_status)\n\
+\[${WHITE}\]\[${RESET}\]\
 \[${YELLOW}\]%\[${RESET}\] "
 
 # Other sources
