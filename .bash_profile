@@ -10,6 +10,10 @@ BOLD=$(tput bold)
 REVERSE=$(tput rev)
 RESET=$(tput sgr0)
 
+function current_time() {
+  echo "[$(date +"%I:%M %p")]"
+}
+
 # Source: https://github.com/robbyrussell/oh-my-zsh/blob/master/lib/git.zsh#L61-L74
 function git_current_branch() {
   local ref
@@ -41,7 +45,7 @@ function node_version() {
 
 function java_version() {
   local JAVA_VERSION=''
-  JAVA_VERSION=$(command java -version 2>&1 >/dev/null | grep 'java version' | awk '{gsub(/"/, "", $3); print $3}')
+  JAVA_VERSION=$(command java -version 2>&1 >/dev/null | head -n 1 | awk -F '"' '{print $2}')
   echo "(Java ${GREEN}${JAVA_VERSION}${RESET})"
 }
 
@@ -62,17 +66,18 @@ function mongodb_status() {
   fi
 }
 
-function current_time() {
-  echo "($(date +"%I:%M %p"))"
+function bitcoin_price() {
+  curl -s -N 'https://api.gemini.com/v1/pubticker/btcusd' | \
+  python -c "import sys, json; res = json.load(sys.stdin); print '(Bitcoin: $' + str(res['last']) + ')'"
 }
 
 # Source: https://www.kirsle.net/wizards/ps1.html
 export PS1="\
 ${BOLD}${RESET}\
 ${WHITE}┌─${RESET} \
-${WHITE}\u@\h${RESET} \
+${WHITE}\$(current_time) \u@\h${RESET} \
 ${BLUE}\w${RESET}\
-\$(git_current_branch) \$(node_version) \$(java_version) \$(docker_status) \$(mongodb_status) \$(current_time)\
+\$(git_current_branch) \$(node_version) \$(java_version) \$(docker_status) \$(mongodb_status)\
 \n\[${WHITE}\]└─\[${RESET}\] \
 \[${YELLOW}\]%\[${RESET}\] "
 
@@ -80,13 +85,15 @@ ${BLUE}\w${RESET}\
 source ~/.git-completion.bash
 
 # Alias
+alias config="vim ~/.bash_profile"
 alias dev="cd ~/Developer"
 
+# NVM
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
-# Setting PATH for Python 3.6
-# The original version is saved in .bash_profile.pysave
+# macOS
+alias reset_launchpad="defaults write com.apple.dock ResetLaunchPad -bool true; killall Dock"
 PATH="/Library/Frameworks/Python.framework/Versions/3.6/bin:${PATH}"
 export PATH
