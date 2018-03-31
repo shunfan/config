@@ -64,6 +64,7 @@ function mongodb_status() {
 
 # Source: https://www.kirsle.net/wizards/ps1.html
 export PS1="\
+\[${YELLOW}\]#\[${RESET}\] \
 \[${WHITE}\]\u@\h\[${RESET}\] \
 \[${BLUE}\]\w\[${RESET}\]\
 \$(git_current_branch) \$(node_version) \$(java_version) \$(docker_status) \$(mongodb_status)\n\
